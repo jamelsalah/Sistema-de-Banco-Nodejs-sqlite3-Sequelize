@@ -1,15 +1,14 @@
 import Sequelize from 'sequelize';
 import database from '../db.js'
-import Usuario from './usuario.js';
  
-const Pessoa = database.define('pessoa', {
+const Person = database.define('person', {
     id: {
         type: Sequelize.INTEGER,
         autoIncrement: true,
         allowNull: false,
         primaryKey: true
     },
-    nome: {
+    name: {
         type: Sequelize.STRING,
         allowNull: false
     },
@@ -18,26 +17,26 @@ const Pessoa = database.define('pessoa', {
         allowNull: false,
         unique: true
     },
-    nascimento: {
+    birth: {
         type: Sequelize.DATE,
         allowNull: false,
     },
-    telefone: {
+    telephone: {
         type: Sequelize.INTEGER,
         allowNull: false,
     },
-    endereco: {
+    address: {
         type: Sequelize.STRING,
         allowNull: false,
     },
-    cep: {
+    postalCode: {
         type: Sequelize.BIGINT,
         allowNull: false,
     }
 });
 
-Pessoa.associate = function(models) {
-    Pessoa.hasMany(models.Usuario, { foreignKey: 'pessoaId' });
+Person.associate = function(models) {
+    Person.hasMany(models.User, { foreignKey: 'personId' });
 };
 
-export default Pessoa;
+export default Person;

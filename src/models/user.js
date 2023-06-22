@@ -1,18 +1,18 @@
 import Sequelize from 'sequelize';
 import database from '../db.js';
 
-const Usuario = database.define('usuario', {
+const User = database.define('user', {
     id: {
         type: Sequelize.INTEGER,
         autoIncrement: true,
         allowNull: false,
         primaryKey: true
     },
-    pessoaId: {
+    personId: {
         type: Sequelize.INTEGER,
         allowNull: false,
         references: {
-          model: 'pessoas',
+          model: 'people',
           key: 'id'
         }
     },
@@ -27,8 +27,12 @@ const Usuario = database.define('usuario', {
     }
 });
 
-Usuario.associate = function(models) {
-    Usuario.belongsTo(models.Pessoa, { foreignKey: 'pessoaId' });
+User.associate = function(models) {
+    User.hasMany(models.Account, { foreignKey: 'userId' });
 };
 
-export default Usuario;
+User.associate = function(models) {
+    User.belongsTo(models.Person, { foreignKey: 'personId' });
+};
+
+export default User;

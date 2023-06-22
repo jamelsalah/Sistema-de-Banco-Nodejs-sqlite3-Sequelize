@@ -1,6 +1,5 @@
-import Pessoa from '../models/pessoa.js';
-import Usuario from '../models/usuario.js';
-import pessoaController from './pessoaController.js';
+import Person from '../models/person.js';
+import User from '../models/user.js';
 
 function loginView(req, res) {
     res.render("loginView/index.html", {})
@@ -9,17 +8,17 @@ function loginView(req, res) {
 async function auth(req, res) {
     const { email, password } = req.body;
 
-    const user = await Usuario.findOne({
+    const user = await User.findOne({
         where: { email: email, password: password }
     });
 
     if(user !== null) {
-        const pessoa = await Pessoa.findOne({
-            where: { id: user.pessoaId }
+        const person = await Person.findOne({
+            where: { id: user.personId }
         });
 
-        if(pessoa !== null) {
-            Object.assign(user, pessoa);
+        if(person !== null) {
+            Object.assign(user, person);
     
             req.session.auth = true;
             req.session.user = user;

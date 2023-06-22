@@ -1,44 +1,45 @@
-import Pessoa from '../models/pessoa.js';
-import Usuario from '../models/usuario.js';
+import Person from '../models/person.js';
+import User from '../models/user.js';
+import Account from '../models/account.js';
 
 function registerView(req, res){
     res.render("registerView/index.html", {});
 }
 
 function userRegister(req, res){
-    const { nome, cpf, nascimento, telefone, endereco, cep, email, senha} = req.body;
+    const { name, cpf, birth, telephone, address, postalCode, email, password} = req.body;
 
-    const pessoa = {
-        nome: nome,
+    const person = {
+        name: name,
         cpf: cpf,
-        nascimento: nascimento,
-        telefone: telefone,
-        endereco: endereco,
-        cep: cep
+        birth: birth,
+        telephone: telephone,
+        address: address,
+        postalCode: postalCode
     }
 
-    const usuario = {
+    const user = {
         email: email,
-        password: senha
+        password: password
     }
 
-    console.log(pessoa)
-    console.log(usuario)
+    console.log(person)
+    console.log(user)
 
     //check for empty fields
         const emptyError = [];
         const msg = "não pode ser vazio."
 
-        for(let i in pessoa) {
-            const atrib = pessoa[i];
+        for(let i in person) {
+            const atrib = person[i];
             
             if(atrib.length == 0) {
                 emptyError.push({name: i, msg: msg})
             }
         }
 
-        for(let i in usuario) {
-            const atrib = usuario[i];
+        for(let i in user) {
+            const atrib = user[i];
             
             if(atrib.length == 0) {
                 emptyError.push({name: i, msg: msg})
@@ -48,48 +49,65 @@ function userRegister(req, res){
         console.log(emptyError);
 
         if(emptyError.length > 0) {
-            res.render("registerView/index.html", {pessoa, usuario, emptyError});
+            res.render("registerView/index.html", {person, user, emptyError});
             return
         }
     // ====
     
-    Pessoa.create(pessoa).then((result)=>{
-        usuario.pessoaId = result.id;
+    Person.create(person).then((result)=>{
+        user.personId = result.id;
 
-        Usuario.create(usuario).then(() => {
-            const sucesso = 'Usuario Cadastrado(a) com Sucesso!';
+        User.create(user).then(() => {
+            const success = 'Usuario Cadastrado(a) com Sucesso!';
 
-            res.render("registerView/index.html", {pessoa, usuario, sucesso});
-        }).catch((err) => {
-            console.log(err);
+            res.render("registerView/index.html", {person, user, success});
+        }).catch((error) => {
+            console.log(error);
             
-            if(err.errors.ValidationErrorItem) {
+            if(error.errors.ValidationErrorItem) {
                 const uniqueError =  {
-                    name : err.ValidationErrorItem.path,
+                    name : error.ValidationErrorItem.path,
                     msg: "já cadastrado em nosso Sistema."
                 }
+
+                console.log(">>>>>>>>>>>>>.>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>" + uniqueError)
     
-                res.render("registerView/index.html", {pessoa, usuario, uniqueError});
+                res.render("registerView/index.html", {person, user, uniqueError});
             } else {
-                const erro = err;
-                res.render("registerView/index.html", {pessoa, usuario, erro});
+                res.render("registerView/index.html", {person, user, error});
             }
         });
-    }).catch((err) => {
-        console.log(err);
+    }).catch((error) => {
+        console.log(error);
 
-        if(err.errors.ValidationErrorItem) {
+        if(error.errors.ValidationErrorItem) {
             const uniqueError =  {
-                name : err.ValidationErrorItem.path,
+                name : error.ValidationErrorItem.path,
                 msg: "já cadastrado em nosso Sistema."
             }
 
-            res.render("registerView/index.html", {pessoa, usuario, uniqueError});
+            res.render("registerView/index.html", {person, user, uniqueError});
         } else {
-            const erro = err;
-            res.render("registerView/index.html", {pessoa, usuario, erro});
+            res.render("registerView/index.html", {person, user, error});
         }
     });
+}
+
+async function homeView(req, res) {
+    const user = req.session.user;
+    if(user) {
+        const accounts = await Account.findAll({
+            where: { userId: user.id }
+        });
+
+        if(!accounts) {
+            console.log("Você não possui contas correntes criadas.")
+        } else {
+            console.log(accounts)
+        }
+
+        res.render("homeView/index.html", {user});
+    }
 }
 
 function listarView(req, res){
@@ -151,4 +169,5 @@ function deletarPessoa(req, res) {
 export default {
     registerView,
     userRegister,
+    homeView
 };

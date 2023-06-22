@@ -12,12 +12,12 @@
 <body>
 
     <div class="container">
-        {{#sucesso}}
+        {{#success}}
             <div class="alert alert-success alert-dismissible">
                 <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                <strong>{{sucesso}}</strong>
+                <strong>{{success}}</strong>
             </div>
-        {{/sucesso}}
+        {{/success}}
 
         {{#emptyError}}
             <div class="alert alert-danger alert-dismissible">
@@ -33,55 +33,55 @@
             </div>
         {{/uniqueError}}
 
-        {{#erro}}
+        {{#error}}
             <div class="alert alert-danger alert-dismissible">
                 <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
                 <strong>{{msg}}</strong>
             </div>
-        {{/erro}}
+        {{/error}}
 
         <h1>Cadastro</h1>
 
         <form method="POST" action="/register">
             <div class="row">
                 <div class="col-3">
-                    <label class="form-label" for="nome">Nome</label>
-                    <input class="form-control" type="text" id="nome" name="nome" value="{{pessoa.nome}}">
+                    <label class="form-label" for="name">Nome</label>
+                    <input class="form-control" type="text" id="name" name="name" value="{{person.name}}">
                 </div>
                 <div class="col-3">
                     <label class="form-label" for="cpf">CPF</label>
-                    <input class="form-control" type="number" id="cpf" name="cpf" value="{{pessoa.cpf}}">
+                    <input class="form-control" type="number" id="cpf" name="cpf" value="{{person.cpf}}">
                 </div>
                 <div class="col-3">
-                    <label class="form-label" for="telefone">Telefone</label>
-                    <input class="form-control" type="number" id="telefone" name="telefone" value="{{pessoa.telefone}}">
+                    <label class="form-label" for="telephone">Telefone</label>
+                    <input class="form-control" type="number" id="telephone" name="telephone" value="{{person.telephone}}">
                 </div>
             </div>
 
             <div class="row">
                 <div class="col-3">
-                    <label class="form-label" for="nascimento">Data de Nascimento</label>
-                    <input class="form-control" type="date" id="nascimento" name="nascimento" value="{{pessoa.nascimento}}">
+                    <label class="form-label" for="birth">Data de Nascimento</label>
+                    <input class="form-control" type="date" id="birth" name="birth" value="{{person.birth}}">
                 </div>
                 <div class="col-3">
-                    <label class="form-label" for="endereco">Endereço</label>
-                    <input class="form-control" type="text" id="endereco" name="endereco" value="{{pessoa.endereco}}">
+                    <label class="form-label" for="address">Endereço</label>
+                    <input class="form-control" type="text" id="address" name="address" value="{{person.address}}">
                 </div>
                 <div class="col-3">
-                    <label class="form-label" for="cep">CEP</label>
-                    <input class="form-control" type="number" id="cep" name="cep" value="{{pessoa.cep}}">
+                    <label class="form-label" for="postalCode">CEP</label>
+                    <input class="form-control" type="number" id="postalCode" name="postalCode" value="{{person.postalCode}}">
                 </div>
             </div>
 
             <div class="row">
                 <div class="col-3">
                     <label class="form-label" for="email">Email</label>
-                    <input class="form-control" type="email" id="email" name="email" value="{{usuario.email}}">
+                    <input class="form-control" type="email" id="email" name="email" value="{{user.email}}">
                 </div>
 
                 <div class="col-3">
-                    <label class="form-label" for="senha">Senha</label>
-                    <input class="form-control" type="password" id="senha" name="senha">
+                    <label class="form-label" for="password">Senha</label>
+                    <input class="form-control" type="password" id="password" name="password">
                 </div>
             </div>
 
