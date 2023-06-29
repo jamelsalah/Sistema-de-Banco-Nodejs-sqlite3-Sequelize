@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Transfer</title>
+</head>
+<body>
+    <h1>Transferencia</h1>
+
+    <div>
+        <h2>Conta Atual</h2>
+        <p><strong>Proprietario:</strong> {{user.name}}</p>
+        <p><strong>Nome da Conta:</strong> {{account.name}}</p>
+        <p><strong>Numero da Conta:</strong> {{account.number}}</p>
+
+        <h2>Conta de Destino</h2>
+        <p><strong>Proprietario:</strong> {{targetUser.name}}</p>
+        <p><strong>CPF:</strong> {{targetUser.cpf}}</p>
+        <p><strong>Nome da Conta:</strong> {{targetAccount.name}}</p>
+        <p><strong>Numero da Conta:</strong> {{targetAccount.number}}</p>
+    </div>
+
+    <form id="form" action="POST">
+        <h2>Informe o Valor que Deseja Transferir:</h2>
+        <label for="value">Valor:</label>
+        <input type="number" id="value" name="value" step="0.01" required>
+        <input type="hidden" id="number" name="number" value="{{targetAccount.number}}">
+        <input type="hidden" id="name" name="name" value="{{targetAccount.name}}">
+        <button type="submit">Transferir</button>
+    </form>
+
+    <script>
+        document.getElementById("form").addEventListener("submit", (event) => {
+            event.preventDefault();
+
+            const value = document.getElementById("value").value;
+            const name = document.getElementById("name").value;
+            const number = document.getElementById("number").value;
+
+            if(confirm(`tem certeza que deseja realizar a transferencia de valor ${value} para conta ${name} de numero ${number}?`)) {
+
+                fetch("/transfer", {
+                    method: "POST",
+                    body: JSON.stringify({
+                        value,
+                        targetAccountNumber: number,
+                        targetAccountName: name
+                    }),
+                    headers: {
+                        "Content-Type": "application/json"
+                    }
+                })
+                .then(response => {
+                    console.log("Resposta do servidor:", response);
+                })
+                .catch(error => {
+                    console.error("Erro na requisição:", error);
+                });
+            }
+        });
+    </script>
+</body>
+</html>
