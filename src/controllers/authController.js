@@ -19,6 +19,8 @@ async function auth(req, res) {
 
         if(person !== null) {
             Object.assign(user, person);
+
+            console.log(user)
     
             req.session.auth = true;
             req.session.user = user;
@@ -27,6 +29,9 @@ async function auth(req, res) {
             const auth_error = true;
             res.render('loginView/index.html', {auth_error})
         }
+    } else {
+        const wrongUser = "Usuario ou Senha Incorretos."
+        res.render('loginView/index.html', {wrongUser, email: email});
     }
 }
 

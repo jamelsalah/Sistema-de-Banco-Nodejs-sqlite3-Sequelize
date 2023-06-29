@@ -21,6 +21,10 @@ const Account = database.define('account', {
         allowNull: false,
         unique: true
     },
+    name: {
+        type: Sequelize.STRING,
+        allowNull: false
+    },
     openingDate: {
         type: Sequelize.DATE,
         allowNull: false

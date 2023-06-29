@@ -1,5 +1,6 @@
 import express from 'express';
 import mustacheExpress from 'mustache-express';
+import bodyParser from 'body-parser';
 import session from 'express-session';
 import db from './src/db.js';
 import { fileURLToPath } from 'url';
@@ -8,6 +9,7 @@ import path from 'path';
 import userRoutes from './src/routes/userRoutes.js';
 import indexRoutes from './src/routes/indexRoutes.js';
 import authRoutes from './src/routes/authRoutes.js';
+import accountRoutes from './src/routes/accountRoutes.js';
 
 const app = express();
 
@@ -17,6 +19,7 @@ const __dirname = path.dirname(__filename);
 app.engine('html', mustacheExpress())
 app.set('view engine', 'html');
 app.use(express.static('src'));
+app.use(bodyParser.json());
 app.set('views', __dirname + '/src/views');
 app.use(session({
     secret: 'secret-token',
@@ -31,6 +34,7 @@ app.use(express.urlencoded({extended: true}))
 app.use('/', indexRoutes);
 app.use('/', authRoutes)
 app.use('/', userRoutes);
+app.use('/', accountRoutes);
 
 db.sync(() => console.log(`Banco de dados conectado`));
 // db.sync(({ force: true })).then(() => {

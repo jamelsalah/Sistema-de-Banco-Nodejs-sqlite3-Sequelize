@@ -10,17 +10,17 @@ function userRegister(req, res){
     const { name, cpf, birth, telephone, address, postalCode, email, password} = req.body;
 
     const person = {
-        name: name,
-        cpf: cpf,
-        birth: birth,
-        telephone: telephone,
-        address: address,
-        postalCode: postalCode
+        name,
+        cpf,
+        birth,
+        telephone,
+        address,
+        postalCode
     }
 
     const user = {
-        email: email,
-        password: password
+        email,
+        password
     }
 
     console.log(person)
@@ -34,7 +34,7 @@ function userRegister(req, res){
             const atrib = person[i];
             
             if(atrib.length == 0) {
-                emptyError.push({name: i, msg: msg})
+                emptyError.push({name: i, msg})
             }
         }
 
@@ -42,7 +42,7 @@ function userRegister(req, res){
             const atrib = user[i];
             
             if(atrib.length == 0) {
-                emptyError.push({name: i, msg: msg})
+                emptyError.push({name: i, msg})
             }
         }
 
@@ -63,14 +63,18 @@ function userRegister(req, res){
             res.render("registerView/index.html", {person, user, success});
         }).catch((error) => {
             console.log(error);
+
+            Person.destroy({
+                where: {id: user.personId}
+            })
             
-            if(error.errors.ValidationErrorItem) {
+            if(error.errors[0]) {
                 const uniqueError =  {
-                    name : error.ValidationErrorItem.path,
+                    name : error.errors[0].path,
                     msg: "já cadastrado em nosso Sistema."
                 }
 
-                console.log(">>>>>>>>>>>>>.>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>" + uniqueError)
+                console.log(uniqueError)
     
                 res.render("registerView/index.html", {person, user, uniqueError});
             } else {
@@ -80,9 +84,9 @@ function userRegister(req, res){
     }).catch((error) => {
         console.log(error);
 
-        if(error.errors.ValidationErrorItem) {
+        if(error.errors[0]) {
             const uniqueError =  {
-                name : error.ValidationErrorItem.path,
+                name : error.errors[0].path,
                 msg: "já cadastrado em nosso Sistema."
             }
 
@@ -100,13 +104,24 @@ async function homeView(req, res) {
             where: { userId: user.id }
         });
 
-        if(!accounts) {
+        console.log(accounts)
+
+        if(accounts.length == 0) {
             console.log("Você não possui contas correntes criadas.")
+            res.render("homeView/index.html", {user, noAccount: {msg: 'Você não possui contas correntes criadas.'}});
         } else {
-            console.log(accounts)
+            const arrayAccounts = [];
+
+            for(let i in accounts) {
+                const account = accounts[i];
+
+                arrayAccounts.push(account.dataValues);
+            }
+
+            console.log(arrayAccounts);
+            res.render("homeView/index.html", {user, arrayAccounts});
         }
 
-        res.render("homeView/index.html", {user});
     }
 }
 
@@ -121,7 +136,7 @@ function listarView(req, res){
 }
 
 function editarView(req, res){
-    let id = req.params.id
+    let id = req.params.id;
     Pessoa.findByPk(id).then(function(pessoa){
         res.render("pessoa/editar.html", {pessoa});
     })
@@ -131,13 +146,13 @@ function editarPessoa(req, res) {
     const { nome, sobrenome, cpf, email, telefone, altura, peso} = req.body;
 
     const pessoa = {
-        nome: nome,
-        sobrenome: sobrenome,
-        cpf: cpf,
-        email: email,
-        telefone: telefone,
-        altura: altura,
-        peso: peso
+        nome,
+        sobrenome,
+        cpf,
+        email,
+        telefone,
+        altura,
+        peso
     }
     
     Pessoa.update(
