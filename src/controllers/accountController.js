@@ -1,6 +1,7 @@
 import Account from '../models/account.js';
 import User from '../models/user.js';
 import Person from '../models/person.js';
+import Transaction from '../models/transaction.js';
 
 function createAccountView(req, res) {
     res.render("createAccountView/index.html", {})
@@ -72,7 +73,7 @@ async function deposit(req, res) {
     const sessionAccount = req.session.account;
 
     if(user  &&  sessionAccount) {
-        const { value } = req.body;
+        const { value, observation } = req.body;
 
         const account = await Account.findOne({
             where: {
@@ -88,6 +89,12 @@ async function deposit(req, res) {
         if(account) {
             const newBalance = parseFloat(account.balance) + parseFloat(value);
 
+            const today = new Date();
+            const year = today.getFullYear();
+            const month = String(today.getMonth() + 1).padStart(2, '0');
+            const day = String(today.getDate()).padStart(2, '0');
+            const date = `${year}-${month}-${day}`;
+
             const result = await Account.update(
                 {balance: newBalance},
                 {where: {
@@ -99,6 +106,23 @@ async function deposit(req, res) {
             }).catch((error) => {
                 return error;
             });
+
+            if(result) {
+                const transaction = await Transaction.create({
+                    accountId: account.id,
+                    type: "C",
+                    transactionDate: date,
+                    value,
+                    observation
+                }).then((result) => {
+                    return result;
+                }).catch((error) => {
+                    return error;
+                })
+
+                console.log(transaction)
+                res.render("accountHome/index.html")
+            }
     
             console.log(result);
         }
@@ -167,67 +191,128 @@ async function transferCheck(req, res) {
     }
 }
 
-function transferView(req, res) {
-}
-
 async function transfer(req, res) {
-    const { targetAccountNumber, targetAccountName, value } = req.body;
+    const { targetAccountNumber, targetAccountName, value, observation } = req.body;
     const account = req.session.account;
+    const user = req.session.user;
+
+    if(!account  ||  !user) {
+        res.render("loginView/index.html", {});
+        return;
+    }
+
 
     const targetAccount = await Account.findOne({
         where: {number: targetAccountNumber, name: targetAccountName}
     }).then((result) => {
-        return result.dataValues;
+        return {success: true, dataValues: result.dataValues};
     }).catch((error) => {
-        return error;
+        return {success: false, error};
     });
 
     const currentAccount = await Account.findOne({
         where: {number: account.number, name: account.name}
     }).then((result) => {
-        return result.dataValues;
+        return {success: true, dataValues: result.dataValues};
     }).catch((error) => {
-        return error;
+        return {success: false, error};
     });
 
-    console.log("target Account >>>" + targetAccount)
+    if(currentAccount.success  &&  targetAccount.success) {
+        if(currentAccount.dataValues.number  !==  targetAccount.dataValues.number) {
+            const currentAccountNewBalance = parseFloat(currentAccount.dataValues.balance) - parseFloat(value);
+            const targetAccountNewBalance = parseFloat(targetAccount.dataValues.balance) + parseFloat(value);
 
-    if(currentAccount  &&  targetAccount) {
-        if(currentAccount.number  !==  targetAccount.number) {
-            const currentAccountNewBalance = parseFloat(currentAccount.balance) - parseFloat(value);
-            const targetAccountNewBalance = parseFloat(targetAccount.balance) + parseFloat(value);
+            const today = new Date();
+            const year = today.getFullYear();
+            const month = String(today.getMonth() + 1).padStart(2, '0');
+            const day = String(today.getDate()).padStart(2, '0');
+            const date = `${year}-${month}-${day}`;
 
             if(currentAccountNewBalance < 0) {
-                console.log("Saldo em Conta insuficiente");
+                const error = "Saldo Insuficiente para Realizar a Tranferencia!";
+                console.log('balance error')
+
+                res.render("loginView/index.html", {error});
                 return;
             }
 
             const currentResult = await Account.update(
                 {balance: currentAccountNewBalance},
                 {where: {
-                    number: currentAccount.number,
-                    name: currentAccount.name
+                    number: currentAccount.dataValues.number,
+                    name: currentAccount.dataValues.name
                 }}
             ).then((result) => {
-                return result;
+                return {success: true, result};
             }).catch((error) => {
-                return error;
+                return {success: false, error};
             })
 
             
             const targetResult = await Account.update(
                 {balance: targetAccountNewBalance},
                 {where: {
-                    number: targetAccount.number,
-                    name: targetAccount.name
+                    number: targetAccount.dataValues.number,
+                    name: targetAccount.dataValues.name
                 }}
             ).then((result) => {
-                return result;
+                return {success: true, result};
             }).catch((error) => {
-                return error;
+                return {success: false, error};
             });
+
+            if(targetResult.success  &&  currentResult.success) {
+                const transactionD = await Transaction.create({
+                    accountId: currentAccount.dataValues.id,
+                    type: "D",
+                    transactionDate: date,
+                    value,
+                    originAccount: currentAccount.dataValues.number,
+                    targetAccount: targetAccount.dataValues.number,
+                    observation
+                }).then((result) => {
+                    return {success: true, dataValues: result.dataValues};
+                }).catch((error) => {
+                    return {success: false, error};
+                });
+
+                const transactionC = await Transaction.create({
+                    accountId: targetAccount.dataValues.id,
+                    type: "C",
+                    transactionDate: date,
+                    value,
+                    originAccount: currentAccount.dataValues.number,
+                    targetAccount: targetAccount.dataValues.number,
+                    observation
+                }).then((result) => {
+                    return {success: true, dataValues: result.dataValues};
+                }).catch((error) => {
+                    return {success: false, error};
+                });
+
+                if(transactionC.success  &&  transactionD.success) {
+                    const success = "Valor Transferido com Sucesso!";
+
+                    res.render("transferView/index.html", {success});
+                    return;
+                } else {
+                    const error = "Algo deu errado com sua Transferencia, tente Novamente mais Tarde.";
+
+                    res.render("transferView/index.html", {error});
+                    return;
+                }
+            } else {
+                const error = "Conta de Destino não Encontrada no Banco de Dados.";
+
+                res.render("transferView/index.html", {error});
+                return;
+            }
         } else {
-            console.log('não pode transferir para a mesma conta!')
+            const error = "Você não Pode Transferir para a mesma Conta.";
+
+            res.render("transferView/index.html", {error});
+            return;
         }
     }
 
@@ -241,6 +326,5 @@ export default {
     deposit,
     transferCheckView,
     transferCheck,
-    transferView,
     transfer
 }

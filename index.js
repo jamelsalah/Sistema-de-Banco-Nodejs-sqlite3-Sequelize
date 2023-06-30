@@ -21,6 +21,7 @@ app.set('view engine', 'html');
 app.use(express.static('src'));
 app.use(bodyParser.json());
 app.set('views', __dirname + '/src/views');
+app.disable('view cache');
 app.use(session({
     secret: 'secret-token',
     name: 'sessionId',

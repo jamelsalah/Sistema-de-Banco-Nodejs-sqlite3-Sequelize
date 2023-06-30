@@ -7,6 +7,20 @@
     <title>Transfer</title>
 </head>
 <body>
+    {{#error}}
+            <div class="alert alert-danger alert-dismissible">
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                <strong>{{error}}</strong>
+            </div>
+    {{/error}}
+
+    {{#success}}
+            <div class="alert alert-success alert-dismissible">
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                <strong>{{success}}</strong>
+            </div>
+    {{/success}}
+
     <h1>Transferencia</h1>
 
     <div>
@@ -22,7 +36,7 @@
         <p><strong>Numero da Conta:</strong> {{targetAccount.number}}</p>
     </div>
 
-    <form id="form" action="POST">
+    <form id="form" method="POST">
         <h2>Informe o Valor que Deseja Transferir:</h2>
         <label for="value">Valor:</label>
         <input type="number" id="value" name="value" step="0.01" required>

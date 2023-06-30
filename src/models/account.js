@@ -39,4 +39,8 @@ Account.associate = function(models) {
     Account.belongsTo(models.User, { foreignKey: 'userId' });
 };
 
+Account.associate = function(models) {
+    Account.hasMany(models.Transaction, { foreignKey: 'accountId' });
+};
+
 export default Account;
