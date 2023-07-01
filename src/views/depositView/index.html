@@ -16,23 +16,36 @@
             window.location.href = "/transferCheck"
         }
     </script>
+    <style>
+        .input-container {
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            margin: 15px;
+        }
+        .value-input {
+            max-width: 500px;
+            margin: 10px;
+        }
+    </style>
 </head>
 
 <body>
     <div class="container">
         <h1>Deposito</h1>
 
-        <h2>olá {{user.name}}</h2>
         <h2>realizar deposito na Conta <strong>{{account.name}}</strong> de Numero <strong>{{account.number}}</strong></h2>
 
         <form id="form">
-            <label for="value">Valor:</label>
-            <input type="number" id="value" name="value" step="0.01" required>
-            <p>BRL</p>
+            <div class="input-container">
+                <label for="value"><strong>Valor:  </strong></label>
+                <input class="form-control value-input" type="number" id="value" name="value" step="0.01" required>
+                <div><strong>  BRL</strong></div>
+            </div>
 
             <input type="hidden" id="name" name="name" value="{{account.name}}">
             <input type="hidden" id="number" name="number" value="{{account.number}}">
-            <button type="submit">Depositar</button>
+            <button type="submit" class="btn btn-primary btn-block">Depositar</button>
         </form>
     </div>
 

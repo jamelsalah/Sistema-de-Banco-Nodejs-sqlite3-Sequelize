@@ -24,12 +24,12 @@
 
         <h2>bem vindo {{user.name}}</h2>
 
-        <p>Conta: {{account.name}}</p>
-        <p>Numero da Conta: {{account.number}}</p>
-        <p>Saldo em Conta: {{account.balance}}</p>
+        <p><strong>Conta:</strong>   {{account.name}}</p>
+        <p><strong>Numero da Conta:</strong>   {{account.number}}</p>
+        <p><strong>Saldo em Conta:</strong>   {{account.balance}}</p>
 
-        <button onclick="depositScreen()">Novo Deposito</button>
-        <button onclick="transferScreen()">Realizar Transferencia</button>
+        <button onclick="depositScreen()" class="btn btn-primary">Novo Deposito</button>
+        <button onclick="transferScreen()" class="btn btn-primary">Realizar Transferencia</button>
     </div>
 
 </body>

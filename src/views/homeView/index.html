@@ -16,6 +16,15 @@
             window.location.href = "/accountHome"
         }
     </script>
+    <style>
+        .account-card {
+            border: 1px solid black;
+            margin: 5px;
+            border-radius: 5px;
+            max-width: 500px;
+            padding: 10px;
+        }
+    </style>
 </head>
 
 <body>
@@ -27,21 +36,23 @@
             <h2>Contas Correntes:</h2>
 
             {{#noAccount}}
-                <p>{{msg}}</p>
+                </strong><p>{{msg}}</p></strong>
             {{/noAccount}}
 
             {{#arrayAccounts}}
-                <div>
-                    <p>{{name}}</p>
-                    <p>numero: {{number}}</p>
+                <div class="account-card">
+                    <div class="row">
+                        <p class="col-3"><strong>conta:</strong> {{name}}</p>
+                        <p class="col-3"><strong>numero:</strong> {{number}}</p>
+                    </div>
                     <form method="POST" action="/accountHome">
                         <input type="hidden" name="number" id="number" value="{{number}}">
-                        <button type="submit" onclick="accountHome()">acessar</button>
+                        <button type="submit" onclick="accountHome()" class="btn btn-primary">acessar</button>
                     </form>
                 </div>
             {{/arrayAccounts}}
 
-            <button onclick="createAccountScreen()">Criar Nova Conta Corrente</button>
+            <button onclick="createAccountScreen()" class="btn btn-primary">Criar Nova Conta Corrente</button>
         </div>
     </div>
 
