@@ -59,10 +59,10 @@
         </div>
     </div>
 
-    <form id="form" method="POST">
+    <form id="form" method="POST" action="/transfer">
         <h2>Informe o Valor que Deseja Transferir:</h2>
-        <input type="hidden" id="number" name="number" value="{{targetAccount.number}}">
-        <input type="hidden" id="name" name="name" value="{{targetAccount.name}}">
+        <input type="hidden" id="targetAccountNumber" name="targetAccountNumber" value="{{targetAccount.number}}">
+        <input type="hidden" id="targetAccountName" name="targetAccountName" value="{{targetAccount.name}}">
         <div class="input-container">
             <label for="value">Valor:</label>
             <input type="number" class="form-control number-input" id="value" name="value" step="0.01" required>
@@ -71,32 +71,17 @@
     </form>
 
     <script>
-        document.getElementById("form").addEventListener("submit", (event) => {
-            event.preventDefault();
+        form.addEventListener("submit", (event) => {
+            //event.preventDefault();
 
             const value = document.getElementById("value").value;
-            const name = document.getElementById("name").value;
-            const number = document.getElementById("number").value;
+            const name = document.getElementById("targetAccountName").value;
+            const number = document.getElementById("targetAccountNumber").value;
 
             if(confirm(`tem certeza que deseja realizar a transferencia de valor ${value} para conta ${name} de numero ${number}?`)) {
-
-                fetch("/transfer", {
-                    method: "POST",
-                    body: JSON.stringify({
-                        value,
-                        targetAccountNumber: number,
-                        targetAccountName: name
-                    }),
-                    headers: {
-                        "Content-Type": "application/json"
-                    }
-                })
-                .then(response => {
-                    console.log("Resposta do servidor:", response);
-                })
-                .catch(error => {
-                    console.error("Erro na requisição:", error);
-                });
+                return true;
+            } else {
+                event.preventDefault();
             }
         });
     </script>

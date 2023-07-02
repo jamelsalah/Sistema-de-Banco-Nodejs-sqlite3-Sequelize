@@ -81,13 +81,13 @@ async function deposit(req, res) {
                 name: sessionAccount.name
             }
         }).then((result) => {
-            return result;
+            return {success: true, dataValues: result.dataValues};
         }).catch((error) => {
-            return error;
+            return {success: false, error};
         });
 
-        if(account) {
-            const newBalance = parseFloat(account.balance) + parseFloat(value);
+        if(account.success) {
+            const newBalance = parseFloat(account.dataValues.balance) + parseFloat(value);
 
             const today = new Date();
             const year = today.getFullYear();
@@ -98,33 +98,42 @@ async function deposit(req, res) {
             const result = await Account.update(
                 {balance: newBalance},
                 {where: {
-                    number: account.number,
-                    name: account.name
+                    number: account.dataValues.number,
+                    name: account.dataValues.name
                 }}
             ).then((result) => {
-                return result;
+                return {success: true, dataValues: result};
             }).catch((error) => {
-                return error;
+                return {success: false, error};
             });
 
-            if(result) {
+            if(result.success) {
                 const transaction = await Transaction.create({
-                    accountId: account.id,
+                    accountId: account.dataValues.id,
                     type: "C",
                     transactionDate: date,
                     value,
                     observation
                 }).then((result) => {
-                    return result;
+                    return {success: true, dataValues: result.dataValues};
                 }).catch((error) => {
-                    return error;
-                })
+                    return {success: false, error};
+                });
 
-                console.log(transaction)
-                res.render("accountHome/index.html")
+                if(transaction.success) {
+                    const success = "Valor Depositado com Sucesso!";
+
+                    res.render("depositView/index.html", {success});
+                }
+            } else {
+                const error = "Erro ao Tranferir o Valor, Tente mais Tarde.";
+
+                res.render("depositView/index.html", {error});
             }
-    
-            console.log(result);
+        } else {
+            const error = "Conta não Encontrada no Banco de Dados.";
+
+            res.render("depositView/index.html", {error});
         }
     }
     
@@ -149,12 +158,12 @@ async function transferCheck(req, res) {
         const targetAccount = await Account.findOne({
             where: {number}
         }).then((result) => {
-            return result;
+            return {success: true, dataValues: result.dataValues};
         }).catch((error) => {
-            return error;
+            return {success: false, error};
         });
 
-        if(targetAccount) {
+        if(targetAccount.success) {
             if(account.number  !==  targetAccount.dataValues.number) {
                 let targetPerson;
                 const targetUser = await User.findOne({
@@ -162,32 +171,47 @@ async function transferCheck(req, res) {
                         id: targetAccount.dataValues.userId
                     }
                 }).then((result) => {
-                    return result;
+                    return {success: true, dataValues: result.dataValues};
                 }).catch((error) => {
-                    return error;
+                    return {success: false, error};
                 });
 
-                if(targetUser) {
+                if(targetUser.success) {
                     targetPerson = await Person.findOne({
                         where: {
                             id: targetUser.dataValues.personId
                         }
                     }).then((result) => {
-                        return result;
+                        return {success: true, dataValues: result.dataValues};
                     }).catch((error) => {
-                        return error;
+                        return {success: false, error};
                     });
 
-                    if(targetPerson) {
+                    if(targetPerson.success) {
                         res.render("transferView/index.html", {account, user, targetAccount: targetAccount.dataValues, targetUser: targetPerson.dataValues});
+                    } else {
+                        const error = "Usuario não Encontrado no Banco de Dados.";
+
+                        res.render("transferCheckView/index.html", {error});
+                        return;
                     }
                 }
-
-
             } else {
-                console.log('não pode transferir para a mesma conta!')
+                console.log('não pode transferir para a mesma conta!');
+                const error = "Não Pode Transferir para a Mesma Conta.";
+
+                res.render("transferCheckView/index.html", {error});
+                return;
             }
+        } else {
+            const error = "Conta não Encontrada no Banco de Dados.";
+
+            res.render("transferCheckView/index.html", {error});
+            return;
         }
+    } else {
+        res.render("loginView/index.html", {});
+        return;
     }
 }
 
@@ -233,7 +257,7 @@ async function transfer(req, res) {
                 const error = "Saldo Insuficiente para Realizar a Tranferencia!";
                 console.log('balance error')
 
-                res.render("loginView/index.html", {error});
+                res.render("transferView/index.html", {error});
                 return;
             }
 
@@ -318,6 +342,14 @@ async function transfer(req, res) {
 
 }
 
+function listView(req, res) {
+    console.log('listview')
+}
+
+function list(req, res) {
+    console.log('list')
+}
+
 export default {
     createAccountView,
     createAccount,
@@ -326,5 +358,7 @@ export default {
     deposit,
     transferCheckView,
     transferCheck,
-    transfer
+    transfer,
+    listView,
+    list
 }

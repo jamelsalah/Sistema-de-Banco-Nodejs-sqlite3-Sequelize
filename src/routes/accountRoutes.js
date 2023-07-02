@@ -10,6 +10,8 @@ router.get('/deposit', accountController.depositView);
 router.post('/deposit', accountController.deposit);
 router.get('/transferCheck', accountController.transferCheckView);
 router.post('/transferCheck', accountController.transferCheck);
-router.post('/transfer', accountController.transfer)
+router.post('/transfer', accountController.transfer);
+router.get('/list', accountController.listView);
+router.post('/list', accountController.list)
 
 export default router;

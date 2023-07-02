@@ -32,48 +32,44 @@
 
 <body>
     <div class="container">
+        {{#error}}
+            <div class="alert alert-danger alert-dismissible">
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                <strong>{{error}}</strong>
+            </div>
+        {{/error}}
+
+        {{#success}}
+                <div class="alert alert-success alert-dismissible">
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    <strong>{{success}}</strong>
+                </div>
+        {{/success}}
+        
         <h1>Deposito</h1>
 
         <h2>realizar deposito na Conta <strong>{{account.name}}</strong> de Numero <strong>{{account.number}}</strong></h2>
 
-        <form id="form">
+        <form id="form" method="post" action="/deposit">
             <div class="input-container">
                 <label for="value"><strong>Valor:  </strong></label>
                 <input class="form-control value-input" type="number" id="value" name="value" step="0.01" required>
                 <div><strong>  BRL</strong></div>
             </div>
 
-            <input type="hidden" id="name" name="name" value="{{account.name}}">
+            <input type="hidden" id="namee" name="namee" value="{{account.name}}">
             <input type="hidden" id="number" name="number" value="{{account.number}}">
             <button type="submit" class="btn btn-primary btn-block">Depositar</button>
         </form>
     </div>
 
     <script>
-        document.getElementById("form").addEventListener("submit", (event) => {
-            event.preventDefault();
+        form.addEventListener("submit", (event) => {
 
-            const value = document.getElementById("value").value;
-            const name = document.getElementById("name").value;
-            const number = document.getElementById("number").value;
-
-            if(confirm(`tem certeza que deseja realizar o deposito de valor ${value} para conta ${name} de numero ${number}?`)) {
-
-                fetch("/deposit", {
-                    method: "POST",
-                    body: JSON.stringify({
-                        value,
-                    }),
-                    headers: {
-                        "Content-Type": "application/json"
-                    }
-                })
-                .then(response => {
-                    console.log("Resposta do servidor:", response);
-                })
-                .catch(error => {
-                    console.error("Erro na requisição:", error);
-                });
+            if(confirm(`tem certeza que deseja realizar o deposito de valor ${value.value} para conta ${namee.value} de numero ${number.value}?`)) {
+                return true;
+            } else {
+                event.preventDefault();
             }
         });
     </script>
